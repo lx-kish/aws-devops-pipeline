@@ -1,0 +1,12 @@
+{
+  "name": "devopstdd",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "run": "index.js",
+    "test": "test"
+  },
+  "author": "lx",
+  "license": "ISC"
+}
