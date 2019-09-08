@@ -1,15 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Roman Numeral Converter</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+
+            color: #ffffff;
+            font-family: Helvetica, "Lato", Arial, sans-serif;
+            font-size: 14px;
+
+            text-align: center;
+            background-color: #73A53E;
+
+            -moz-transition-property: text-shadow;
+            -moz-transition-duration: 4s;
+            -webkit-transition-property: text-shadow;
+            -webkit-transition-duration: 4s;
+            text-shadow: none;
+        }
+
+        .label {
+            margin-top: 4em;
+            text-transform: uppercase;
+            margin-bottom: 2.5em;
+        }
+
+        .inputfield {
+            background-color: #73A53E;
+            border: none;
+            outline: none;
+            border-bottom: 2px solid #33342D;
+            text-align: center;
+            font-size: 6em;
+            width: 75%;
+            color: #ffffff;
+        }
+
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px #73A53E inset !important;
+        }
+
+        input:-webkit-autofill {
+            -webkit-text-fill-color: #ffffff !important;
+        }
+
+        .button-container {
+            margin-top: 2.5em;
+        }
+
+        .btn {
+            color: #ffffff;
+            text-transform: uppercase;
+            box-shadow: none;
+            background-color: #33342D;
+            height: 7em;
+            width: 7em;
+            border: none;
+            outline: none;
+            border-radius: 50%;
+            font-size: 1.5em;
+        }
+
+        .btn:hover {
+            cursor: pointer;
+        }
+
+        #message {
+            display: none;
+            position: absolute;
+            height: 80%;
+            width: 80%;
+            left: 10%;
+            top: 10%;
+            background-color: rgba(51, 52, 45, .3);
+            text-align: center;
+            background-color: #33342D;
+            color: #ffffff;
+            opacity: .8;
+        }
+
+        #message-close {
+            position: absolute;
+            top: 0;
+            right: .3em;
+            font-size: 3em;
+
+            transform: rotate(-45deg);
+            /*using for symbol '+'*/
+            -webkit-transform: rotate(-45deg);
+            /* Safari */
+            -moz-transform: rotate(-45deg);
+            /* Firefox */
+            -ms-transform: rotate(-45deg);
+            /* IE */
+            -o-transform: rotate(-45deg);
+            /* Opera */
+        }
+
+        #message-close:hover {
+            cursor: pointer;
+        }
+
+        #message-text {
+            width: 80%;
+            text-align: center;
+            margin-top: 15%;
+            font-size: 3em;
+        }
+    </style>
+
+    <script>
+        function showMessage(messageText) {
+            var mes = document.querySelector("#message");
+            var mesText = document.querySelector("#message-text");
+            mes.style.display = "block";
+
+            mesText.innerHTML = messageText;
+            // setTimeout(function () { mes.style.display = "none"; }, 10000);
+        }
+
+        function addEvent(obj, type, fn) {
+            if (obj.addEventListener) {
+                obj.addEventListener(type, fn, false);
+            }
+            else if (obj.attachEvent) {
+                obj["e" + type + fn] = fn;
+                obj[type + fn] = function () { obj["e" + type + fn](window.event); }
+                obj.attachEvent("on" + type, obj[type + fn]);
+            }
+            else {
+                obj["on" + type] = obj["e" + type + fn];
+            }
+        }
+
+        addEvent(document, 'submit', function (e) {
+            e.preventDefault();
+
+            var request = new XMLHttpRequest();
+            var url = "/";
+            request.open("POST", url, true);
+            request.setRequestHeader("Content-Type", "application/json");
+            request.onload = function () {
+                if (request.status !== 200) {
+                    showMessage("Error " + request.status + ": " + request.statusText);
+                } else if (request.status === 200) {
+                    var jsonData = JSON.parse(request.response);
+                    if (jsonData.value) {
+                        document.getElementById("figure").value = jsonData.value;
+                    }
+                    if (jsonData.validation) {
+                        showMessage(jsonData.validation);
+                    }
+                    if (jsonData.error) {
+                        showMessage("An error occured while converting: " + jsonData.error);
+                    }
+                } else {
+                    showMessage("Something went completely wrong: " + request.response);
+                }
+            };
+            var figure = document.getElementById("figure").value;
+            var data = JSON.stringify({ "figure": figure });
+            request.send(data);
+            console.log("request.send = " + data);
+        })
+    </script>
 </head>
+
 <body>
-    <form method="post">
-        <input type="text" class="textfield">
-        <button class="btn">Convert</button>
+    <form id="converter" method="post">
+        <h1 class="label">input a number</h1>
+        <div class="input-container">
+            <input id="figure" type="text" class="inputfield" name="figure" autocomplete="off" active>
+        </div>
+        <div class="button-container">
+            <button id="btn" class="btn">Convert</button>
+        </div>
     </form>
+    <div id="message">
+        <span id="message-close" onclick="document.querySelector('#message').style.display = 'none';">+</span>
+        <p id="message-text"></p>
+    </div>
 </body>
+
 </html>
