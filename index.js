@@ -2,7 +2,7 @@ var port = process.env.PORT || 3000,
     http = require('http'),
     fs = require('fs'),
     html = fs.readFileSync('index.html'),
-    converter = require('./js/converter'),
+    convert = require('./js/converter'),
     tmp = './tmp/app.log';
 
 var log = function (entry) {
@@ -24,20 +24,17 @@ var server = http.createServer(function (req, res) {
                 if (body) {
                     log('Received message: ' + body);
                     obj = JSON.parse(body);
-                    console.log("Getting data from http request: " + obj.figure);
-                    body += obj.figure;
-                    // converter
+                    body = convert(obj.value);
                 } else {
-                    body += 'Bad request: ' + req;
+                    body = JSON.stringify({ "error": 'bad request - ' + req });
                 }
             } else if (req.url = '/scheduled') {
-                // console.log('this is the end with address "/scheduled"; ' + chunk);
                 log('Received task ' + req.headers['x-aws-sqsd-taskname'] + ' scheduled at ' + req.headers['x-aws-sqsd-scheduled-at']);
             } else {
 
             }
             res.writeHead(200, 'OK', { 'Content-Type': 'text/plain' });
-            res.write('{"value": "MCMLXXXIV"}');
+            res.write(body);
             res.end();
         });
     } else {

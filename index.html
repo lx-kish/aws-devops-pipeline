@@ -85,7 +85,7 @@
             text-align: center;
             background-color: #33342D;
             color: #ffffff;
-            opacity: .8;
+            opacity: .9;
         }
 
         #message-close {
@@ -111,7 +111,7 @@
         }
 
         #message-text {
-            width: 80%;
+            position: relative;
             text-align: center;
             margin-top: 15%;
             font-size: 3em;
@@ -155,6 +155,7 @@
                 } else if (request.status === 200) {
                     var jsonData = JSON.parse(request.response);
                     if (jsonData.value) {
+                        console.log(request.response);
                         document.getElementById("figure").value = jsonData.value;
                     }
                     if (jsonData.validation) {
@@ -164,11 +165,11 @@
                         showMessage("An error occured while converting: " + jsonData.error);
                     }
                 } else {
-                    showMessage("Something went completely wrong: " + request.response);
+                    showMessage("Something went completely wrong: " + '\n' + request.response);
                 }
             };
             var figure = document.getElementById("figure").value;
-            var data = JSON.stringify({ "figure": figure });
+            var data = JSON.stringify({ "value": figure });
             request.send(data);
             console.log("request.send = " + data);
         })
